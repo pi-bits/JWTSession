@@ -1,0 +1,7 @@
+jwt:
+      expire:
+            hours:  24
+      auth:
+            header: x-auth-token
+      token:
+            secret: something-secret-you-cannot-keep-it
