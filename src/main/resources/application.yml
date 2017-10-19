@@ -5,3 +5,7 @@ jwt:
             header: x-auth-token
       token:
             secret: something-secret-you-cannot-keep-it
+
+management:
+  security:
+    enabled:true

@@ -2,14 +2,23 @@ package com.session.jwt.model;
 
 public class JwtUser {
     private String userName;
+    private String password;
     private String role;
 
-    public JwtUser() {
+    public JwtUser(String userName, String password, String role) {
+        this.userName = userName;
+        this.password = password;
+        this.role = role;
     }
 
-    public JwtUser(String userName, String role) {
+    public JwtUser() {
+        
+    }
+
+
+    public JwtUser(String userName, String password) {
         this.userName = userName;
-        this.role = role;
+        this.password = password;
     }
 
     public String getUserName() {
@@ -20,6 +29,12 @@ public class JwtUser {
         this.userName = userName;
     }
 
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
     public String getRole() {
         return role;
     }

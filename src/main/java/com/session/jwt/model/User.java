@@ -29,6 +29,14 @@ public class User {
         return ROLE_USER;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     private String userName;
     private String password;
     private String email;
@@ -38,7 +46,10 @@ public class User {
     public final static String ROLE_ADMIN = "admin";
     public final static String ROLE_USER = "user";
 
+public User()
+{
 
+}
     private User(UserBuilder userBuilder) {
         this.userName = userBuilder.userName;
         this.password = userBuilder.password;
@@ -58,10 +69,10 @@ public class User {
         private String email;
         private String role;
         private boolean activated;
-private UserBuilder()
-{
 
-}
+        private UserBuilder() {
+
+        }
 
         public UserBuilder userName(String userName) {
             this.userName = userName;

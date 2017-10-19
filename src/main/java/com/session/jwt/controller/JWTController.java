@@ -33,10 +33,11 @@ public class JWTController {
     public ResponseEntity<?> auth(@RequestBody AuthDTO auth) {
         String userName = auth.getUserName();
         String passWord = auth.getPassWord();
+        String role = auth.getRole();
 
         Boolean correctCredentials = userService.authenticate(userName, passWord);
         if (correctCredentials) {
-            JwtUser jwtUser = new JwtUser(userName, passWord);
+            JwtUser jwtUser = new JwtUser(userName, passWord,role);
             return ResponseEntity.ok(jwtService.getToken(jwtUser));
         }
         return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
