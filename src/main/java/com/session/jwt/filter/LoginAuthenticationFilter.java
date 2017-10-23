@@ -1,8 +1,13 @@
-package com.session.jwt.security;
+package com.session.jwt.filter;
 
+import com.session.jwt.exception.InvalidTokenException;
+import com.session.jwt.security.LoginAuthenticationToken;
+import com.session.jwt.security.LoginSuccessHandler;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -10,10 +15,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
+
 public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    public LoginAuthenticationFilter() {
+
+    public LoginAuthenticationFilter(LoginSuccessHandler loginSuccessHandler, AuthenticationManager authenticationManager) {
         super("/rest/**");
+        super.setAuthenticationSuccessHandler(loginSuccessHandler);
+        setAuthenticationManager(authenticationManager);
+
     }
 
     @Override
@@ -21,7 +32,7 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
         String header = httpServletRequest.getHeader("x-auth-token");
         if (header==null)
         {
-          throw new RuntimeException("Token Missing");
+          throw new InvalidTokenException("Token Missing");
         }else {
             LoginAuthenticationToken loginAuthenticationToken = new LoginAuthenticationToken(header);
            return  getAuthenticationManager().authenticate(loginAuthenticationToken);
@@ -35,4 +46,11 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
         super.successfulAuthentication(request, response, chain, authResult);
         chain.doFilter(request,response);
     }
+
+    @Override
+    public void setSessionAuthenticationStrategy(SessionAuthenticationStrategy sessionStrategy) {
+        super.setSessionAuthenticationStrategy(sessionStrategy);
+    }
+
+
 }

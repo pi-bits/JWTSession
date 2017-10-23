@@ -4,6 +4,7 @@ import com.session.jwt.model.JwtUser;
 import com.session.jwt.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter(urlPatterns = { "/api/secure/*" })
+@Component
 public class JwtFilter implements Filter {
 
     @Autowired
@@ -29,6 +31,8 @@ public class JwtFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         final HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+        try
+        {
         final String authHeaderVal = httpRequest.getHeader(authHeader);
 
         if (null==authHeaderVal)
@@ -37,8 +41,7 @@ public class JwtFilter implements Filter {
             return;
         }
 
-        try
-        {
+
             JwtUser jwtUser = jwtTokenService.getUser(authHeaderVal);
             httpRequest.setAttribute("jwtUser", jwtUser);
         }
