@@ -1,6 +1,9 @@
 package com.session.jwt;
 
 import com.session.jwt.exception.InvalidTokenException;
+import com.session.jwt.model.JwtUser;
+import com.session.jwt.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +29,8 @@ public class SecuredResourcesTest {
     @Autowired
     WebApplicationContext webApplicationContext;
 
-
+    @Autowired
+    JwtService jwtService;
     protected MockMvc mockMvc;
 
     @Before
@@ -40,7 +44,7 @@ public class SecuredResourcesTest {
 
     }
 
-    @Test(expected =InvalidTokenException.class)
+    @Test(expected = InvalidTokenException.class)
     public void testSecuredResourceWithNoAuth() throws Exception {
         mockMvc.perform(get("/rest/home"))
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
@@ -48,10 +52,22 @@ public class SecuredResourcesTest {
     }
 
 
-    @Test
-    public void testSecuredResourceWithAuth() throws Exception {
+    @Test(expected = ExpiredJwtException.class)
+    public void testSecuredResourceWithExpiredAuth() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("x-auth-token","eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJlMTA4NzcxNC1lMmNkLTQ5MTQtOTdiZi1hZTVhNGYzNGQ3OWIiLCJzdWIiOiJ1c2VyMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTUwODU4NjI2MywiZXhwIjoxNTA4NjcyNjYzfQ.4nGNCU2EFu5afzP9GGpYbYIIUTwe6XQU-tNdTsFJmY8bcKIV3uNQ4OODzHlR5f0m8ajsAKIDp3xZpJv-w8MwoQ");
+        headers.add("x-auth-token", "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJlMTA4NzcxNC1lMmNkLTQ5MTQtOTdiZi1hZTVhNGYzNGQ3OWIiLCJzdWIiOiJ1c2VyMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTUwODU4NjI2MywiZXhwIjoxNTA4NjcyNjYzfQ.4nGNCU2EFu5afzP9GGpYbYIIUTwe6XQU-tNdTsFJmY8bcKIV3uNQ4OODzHlR5f0m8ajsAKIDp3xZpJv-w8MwoQ");
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/rest/home").headers(headers);
+
+        mockMvc.perform(requestBuilder);
+    }
+
+    @Test
+    public void testSecuredResourceWithvalidAuth() throws Exception {
+        String validToken = jwtService.getToken(new JwtUser("user1", "123", "admin"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-auth-token", validToken);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/rest/home").headers(headers);
 

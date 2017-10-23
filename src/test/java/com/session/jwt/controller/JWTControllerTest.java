@@ -1,6 +1,8 @@
 package com.session.jwt.controller;
 
 import com.session.jwt.JWTApplication;
+import com.session.jwt.model.JwtUser;
+import com.session.jwt.service.JwtService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +33,9 @@ public class JWTControllerTest {
     @Autowired
     WebApplicationContext webApplicationContext;
 
+    @Autowired
+    JwtService jwtService;
+
     protected MockMvc mockMvc;
 
 
@@ -58,14 +63,27 @@ public class JWTControllerTest {
                 .andExpect(status().is(401));
     }
 
+
     @Test
-    public void testHelloSecured() throws Exception {
+    public void testHelloSecuredWithValidToken() throws Exception {
+        String validToken = jwtService.getToken(new JwtUser("user1", "123", "admin"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("x-auth-token",validToken);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/secure/hello/prashant").headers(headers);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is2xxSuccessful());
+    }
+
+
+    @Test
+    public void testHelloSecuredWithExpiredToken() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("x-auth-token","eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJlMTA4NzcxNC1lMmNkLTQ5MTQtOTdiZi1hZTVhNGYzNGQ3OWIiLCJzdWIiOiJ1c2VyMSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTUwODU4NjI2MywiZXhwIjoxNTA4NjcyNjYzfQ.4nGNCU2EFu5afzP9GGpYbYIIUTwe6XQU-tNdTsFJmY8bcKIV3uNQ4OODzHlR5f0m8ajsAKIDp3xZpJv-w8MwoQ");
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/secure/hello/prashant").headers(headers);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
